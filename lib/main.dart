@@ -12,22 +12,43 @@ void main() async {
 
   // Initialize Hive
   await HistoryService().init();
+  debugPrint('✓ Hive initialized successfully');
 
   // Request camera permission
+  debugPrint('Requesting camera permission...');
   final cameraStatus = await Permission.camera.request();
 
   if (cameraStatus.isGranted) {
+    debugPrint('✓ Camera permission granted');
     try {
       cameras = await availableCameras();
       if (cameras.isEmpty) {
-        debugPrint('No cameras found on this device');
+        debugPrint('⚠ No cameras found on this device');
+      } else {
+        debugPrint('✓ Found ${cameras.length} camera(s):');
+        for (var i = 0; i < cameras.length; i++) {
+          debugPrint(
+            '  Camera $i: ${cameras[i].name} - ${cameras[i].lensDirection}',
+          );
+        }
       }
     } on CameraException catch (e) {
-      debugPrint('Camera Error: ${e.code}\nMessage: ${e.description}');
+      debugPrint('❌ Camera Error: ${e.code}');
+      debugPrint('   Message: ${e.description}');
+      cameras = [];
+    } catch (e) {
+      debugPrint('❌ Unexpected error initializing camera: $e');
       cameras = [];
     }
+  } else if (cameraStatus.isDenied) {
+    debugPrint('❌ Camera permission denied');
+    cameras = [];
+  } else if (cameraStatus.isPermanentlyDenied) {
+    debugPrint('❌ Camera permission permanently denied');
+    debugPrint('   User needs to enable it in app settings');
+    cameras = [];
   } else {
-    debugPrint('Camera permission denied');
+    debugPrint('❌ Camera permission status: $cameraStatus');
     cameras = [];
   }
 

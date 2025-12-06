@@ -117,8 +117,48 @@ class HomeScreen extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (cameras.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tidak ada kamera ditemukan')),
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.camera_alt_outlined, color: AppColors.error),
+                  SizedBox(width: 8),
+                  Text('Kamera Tidak Tersedia'),
+                ],
+              ),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Aplikasi tidak dapat menemukan kamera pada perangkat Anda.',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 16),
+                  Text('Kemungkinan penyebab:'),
+                  SizedBox(height: 8),
+                  Text('• Izin kamera ditolak'),
+                  Text('• Kamera sedang digunakan aplikasi lain'),
+                  Text('• Perangkat tidak memiliki kamera'),
+                  SizedBox(height: 16),
+                  Text(
+                    'Solusi:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text('1. Pastikan izin kamera sudah diberikan'),
+                  Text('2. Tutup aplikasi lain yang menggunakan kamera'),
+                  Text('3. Restart aplikasi'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
           );
           return;
         }
