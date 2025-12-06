@@ -76,6 +76,19 @@ class _CameraScreenState extends State<CameraScreen> {
                               await _initializeControllerFuture;
                               final image = await _controller.takePicture();
 
+                              if (!context.mounted) return;
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ResultScreen(imagePath: image.path),
+                                ),
+                              );
+                            } catch (e) {
+                              // Error taking picture
+                            }
+                          },
                           backgroundColor: Colors.white,
                           child: const Icon(
                             Icons.camera_alt,
