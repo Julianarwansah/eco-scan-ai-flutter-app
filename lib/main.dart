@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'services/history_service.dart';
@@ -12,10 +13,21 @@ void main() async {
   // Initialize Hive
   await HistoryService().init();
 
-  try {
-    cameras = await availableCameras();
-  } on CameraException catch (e) {
-    debugPrint('Error: $e.code\nError Message: $e.message');
+  // Request camera permission
+  final cameraStatus = await Permission.camera.request();
+
+  if (cameraStatus.isGranted) {
+    try {
+      cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        debugPrint('No cameras found on this device');
+      }
+    } on CameraException catch (e) {
+      debugPrint('Camera Error: ${e.code}\nMessage: ${e.description}');
+      cameras = [];
+    }
+  } else {
+    debugPrint('Camera permission denied');
     cameras = [];
   }
 
